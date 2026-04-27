@@ -1,0 +1,144 @@
+import React from 'react';
+import { Moon, Sun, Monitor, User, Building2, Bell, Shield, Database } from 'lucide-react';
+import GlassCard from '../components/GlassCard';
+import { useAppContext } from '../context/AppContext';
+
+import { useState } from 'react';
+const Settings = () => {
+  const { state, dispatch } = useAppContext();
+  const { theme, userMode, profile } = state.settings;
+  const [selectedTab, setSelectedTab] = useState('profile');
+  const [profileData, setProfileData] = useState({ name: profile?.name || '', email: profile?.email || '' });
+
+  const handleThemeChange = (newTheme) => {
+    if (newTheme !== theme && newTheme !== 'system') {
+      dispatch({ type: 'TOGGLE_THEME' });
+    }
+  };
+
+  const handleModeChange = (newMode) => {
+    if (newMode !== userMode) {
+      dispatch({ type: 'SET_USER_MODE', payload: newMode });
+    }
+  };
+
+
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold mb-1">Platform Settings</h2>
+        <p className="text-[var(--text-muted)] text-sm">Manage your account, preferences, and enterprise features</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-1 space-y-2">
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-fin-primary/20 text-fin-primary font-medium">
+            <User size={18} />
+            <span>Profile & Account</span>
+          </button>
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-[var(--text-muted)] hover:bg-black/10 dark:hover:bg-white/5 hover:text-[var(--text-primary)] transition-colors">
+            <Monitor size={18} />
+            <span>Preferences</span>
+          </button>
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-[var(--text-muted)] hover:bg-black/10 dark:hover:bg-white/5 hover:text-[var(--text-primary)] transition-colors">
+            <Bell size={18} />
+            <span>Notifications</span>
+          </button>
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-[var(--text-muted)] hover:bg-black/10 dark:hover:bg-white/5 hover:text-[var(--text-primary)] transition-colors">
+            <Shield size={18} />
+            <span>Security</span>
+          </button>
+          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-[var(--text-muted)] hover:bg-black/10 dark:hover:bg-white/5 hover:text-[var(--text-primary)] transition-colors">
+            <Database size={18} />
+            <span>Data & Export</span>
+          </button>
+        </div>
+
+        <div className="md:col-span-2 space-y-6">
+          <GlassCard>
+            <h3 className="text-lg font-bold mb-4">Platform Mode</h3>
+            <p className="text-sm text-[var(--text-muted)] mb-4">Switch between Personal Finance and Enterprise Commercial modes.</p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <button 
+                onClick={() => handleModeChange('personal')}
+                className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all ${
+                  userMode === 'personal' 
+                    ? 'border-fin-primary bg-fin-primary/10' 
+                    : 'border-[var(--border-color)] hover:border-fin-primary/50 bg-black/5 dark:bg-white/5'
+                }`}
+              >
+                <User size={32} className={`mb-3 ${userMode === 'personal' ? 'text-fin-primary' : 'text-[var(--text-muted)]'}`} />
+                <span className="font-bold">Personal Mode</span>
+                <span className="text-xs text-[var(--text-muted)] mt-1">Individual expense tracking</span>
+              </button>
+
+              <button 
+                onClick={() => handleModeChange('commercial')}
+                className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all ${
+                  userMode === 'commercial' 
+                    ? 'border-fin-primary bg-fin-primary/10' 
+                    : 'border-[var(--border-color)] hover:border-fin-primary/50 bg-black/5 dark:bg-white/5'
+                }`}
+              >
+                <Building2 size={32} className={`mb-3 ${userMode === 'commercial' ? 'text-fin-primary' : 'text-[var(--text-muted)]'}`} />
+                <span className="font-bold">Commercial Mode</span>
+                <span className="text-xs text-[var(--text-muted)] mt-1">Enterprise invoice & vendor tools</span>
+              </button>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="text-lg font-bold mb-4">Appearance</h3>
+            <p className="text-sm text-[var(--text-muted)] mb-4">Customize the UI theme.</p>
+            
+            <div className="flex space-x-4">
+              <button 
+                onClick={() => handleThemeChange('light')}
+                className={`flex-1 flex items-center justify-center p-4 rounded-xl border transition-all ${
+                  theme === 'light' ? 'border-fin-primary bg-fin-primary/10 text-fin-primary font-bold' : 'border-[var(--border-color)] text-[var(--text-muted)] hover:bg-black/5'
+                }`}
+              >
+                <Sun size={20} className="mr-2" /> Light
+              </button>
+              <button 
+                onClick={() => handleThemeChange('dark')}
+                className={`flex-1 flex items-center justify-center p-4 rounded-xl border transition-all ${
+                  theme === 'dark' ? 'border-fin-primary bg-fin-primary/10 text-fin-primary font-bold' : 'border-[var(--border-color)] text-[var(--text-muted)] hover:bg-white/5'
+                }`}
+              >
+                <Moon size={20} className="mr-2" /> Dark
+              </button>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="text-lg font-bold mb-4">Data Management</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-color)]">
+                <div>
+                  <h4 className="font-bold text-sm">Export All Data</h4>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">Download your expenses and settings as JSON/CSV.</p>
+                </div>
+                <button className="glass-button text-sm">Export</button>
+              </div>
+              
+              <div className="flex justify-between items-center p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                <div>
+                  <h4 className="font-bold text-sm text-red-500">Reset Account</h4>
+                  <p className="text-xs text-red-400/80 mt-1">Permanently delete all your data and start fresh.</p>
+                </div>
+                <button className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 border border-red-500/30 rounded-lg text-sm font-medium transition-colors">
+                  Reset Data
+                </button>
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Settings;
