@@ -24,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <p className="text-white text-sm font-medium">{`${label || payload[0].name}`}</p>
         {payload.map((entry, index) => (
           <p key={index} className="text-sm font-bold" style={{ color: entry.color }}>
-            {`${entry.name}: $${entry.value.toFixed(2)}`}
+            {`${entry.name}: ₹${entry.value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
         ))}
       </div>
@@ -65,7 +65,7 @@ export const CustomLineChart = ({ data, lines, xAxisKey = "name" }) => {
       <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
         <XAxis dataKey={xAxisKey} stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
-        <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
+        <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val.toLocaleString('en-IN')}`} />
         <Tooltip content={<CustomTooltip />} />
         {lines.map((line, index) => (
           <Line 
@@ -89,7 +89,7 @@ export const CustomBarChart = ({ data, bars, xAxisKey = "name" }) => {
       <BarChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
         <XAxis dataKey={xAxisKey} stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
-        <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
+        <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val.toLocaleString('en-IN')}`} />
         <Tooltip content={<CustomTooltip />} />
         <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: 'var(--text-muted)' }} />
         {bars.map((bar, index) => (
