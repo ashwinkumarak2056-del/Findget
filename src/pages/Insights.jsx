@@ -8,11 +8,13 @@ import { analyzeSpending, detectDuplicates, generateRecommendations } from '../u
 
 const Insights = () => {
   const { state } = useAppContext();
-  const { expenses, budgets } = state;
+  const { expenses, budgets, settings } = state;
+  const userMode = settings.userMode;
+  const financialProfile = settings.financialProfile?.[userMode] || null;
 
-  const analysis = analyzeSpending(expenses, budgets);
+  const analysis = analyzeSpending(expenses, budgets, financialProfile);
   const duplicates = detectDuplicates(expenses);
-  const recommendations = generateRecommendations(analysis);
+  const recommendations = generateRecommendations(analysis, financialProfile);
 
   // Mock forecast data
   const forecastData = [
@@ -138,7 +140,7 @@ const Insights = () => {
                     <div key={idx} className="p-3 bg-black/20 dark:bg-white/5 rounded-lg border border-red-500/30">
                       <div className="flex justify-between mb-1">
                         <span className="text-sm font-medium">{dup.duplicate.merchant}</span>
-                        <span className="text-sm font-bold">${dup.duplicate.amount}</span>
+                        <span className="text-sm font-bold">₹{dup.duplicate.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                       <p className="text-xs text-[var(--text-muted)]">Potential duplicate charge on {dup.duplicate.date}</p>
                     </div>

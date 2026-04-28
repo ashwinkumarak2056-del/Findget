@@ -9,9 +9,34 @@ import { analyzeSpending } from '../utils/aiEngine';
 
 const Dashboard = () => {
   const { state } = useAppContext();
-  const { expenses, budgets } = state;
+  const { expenses, budgets, settings } = state;
   
-  const analysis = analyzeSpending(expenses, budgets);
+  const userMode = settings.userMode;
+  const financialProfile = settings.financialProfile?.[userMode] || null;
+  
+  const analysis = analyzeSpending(expenses, budgets, financialProfile);
+
+  // Dynamic calculations based on mode
+  let totalIncome = 0;
+  let targetSavings = 0;
+  let precommittedExpenses = 0;
+  
+  if (userMode === 'personal' && financialProfile) {
+    totalIncome = (financialProfile.fixedIncome || 0) + (financialProfile.variableIncome || 0);
+    targetSavings = financialProfile.savingsGoal || 0;
+    precommittedExpenses = financialProfile.precommittedExpenses || 0;
+  } else if (userMode === 'commercial' && financialProfile) {
+    totalIncome = financialProfile.monthlyRevenueTarget || 0;
+    targetSavings = totalIncome - (financialProfile.operatingBudget || 0);
+    precommittedExpenses = financialProfile.precommittedExpenses || 0;
+  }
+
+  // Calculate Available Budget
+  // Total Income - Precommitted - Target Savings
+  const availableBudget = Math.max(0, totalIncome - precommittedExpenses - targetSavings);
+
+  const currentSavings = Math.max(0, totalIncome - precommittedExpenses - analysis.totalSpent);
+  const savingsPercent = targetSavings > 0 ? Math.min(100, Math.round((currentSavings / targetSavings) * 100)) : 0;
 
   // Prepare Chart Data
   const pieData = Object.entries(analysis.categorySpending)
@@ -65,13 +90,12 @@ const Dashboard = () => {
             <div>
               <p className="text-[var(--text-muted)] text-sm font-medium">Monthly Budget</p>
               <h3 className="text-2xl font-bold text-[var(--text-primary)]">
-                <AnimatedCounter value={budgets.reduce((acc, b) => acc + b.limit, 0)} prefix="₹" decimals={0} />
+                <AnimatedCounter value={availableBudget} prefix="₹" decimals={0} />
               </h3>
             </div>
           </div>
-          <div className="flex items-center text-sm text-fin-primary relative z-10">
-            <ArrowDownRight size={16} className="mr-1" />
-            <span>On track to save ₹4,500</span>
+          <div className="flex items-center text-sm text-[var(--text-muted)] relative z-10">
+            <span>Suggested budget limit</span>
           </div>
         </GlassCard>
 
@@ -106,14 +130,14 @@ const Dashboard = () => {
             <div>
               <p className="text-[var(--text-muted)] text-sm font-medium">Total Savings</p>
               <h3 className="text-2xl font-bold text-[var(--text-primary)]">
-                <AnimatedCounter value={980450} prefix="₹" />
+                <AnimatedCounter value={currentSavings} prefix="₹" decimals={2} />
               </h3>
             </div>
           </div>
           <div className="w-full bg-black/20 rounded-full h-2 mt-2">
-            <div className="bg-purple-500 h-2 rounded-full" style={{ width: '65%' }}></div>
+            <div className="bg-purple-500 h-2 rounded-full transition-all duration-1000" style={{ width: `${savingsPercent}%` }}></div>
           </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1">65% of yearly goal</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">{savingsPercent}% of monthly goal</p>
         </GlassCard>
       </div>
 
@@ -147,31 +171,38 @@ const Dashboard = () => {
               </h3>
               
               <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-                {analysis.overspendingAlerts.length > 0 ? (
+                {analysis.overspendingAlerts.length > 0 && 
                   analysis.overspendingAlerts.map((alert, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start space-x-3">
+                    <div key={`over-${idx}`} className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start space-x-3">
                       <AlertTriangle className="text-red-400 shrink-0 mt-0.5" size={16} />
                       <div>
-                        <p className="text-sm font-medium text-red-400">{alert.category} Overbudget</p>
-                        <p className="text-xs text-[var(--text-muted)]">Exceeded by ₹{alert.excess.toFixed(2)} ({alert.percentage}%)</p>
+                        <p className="text-sm font-medium text-red-400">{alert.category} Over Budget</p>
+                        <p className="text-xs text-[var(--text-muted)]">Spent ₹{alert.spent.toLocaleString('en-IN')} of ₹{alert.limit.toLocaleString('en-IN')} (+₹{alert.excess.toLocaleString('en-IN')})</p>
                       </div>
                     </div>
                   ))
-                ) : (
+                }
+                {analysis.warningAlerts && analysis.warningAlerts.length > 0 &&
+                  analysis.warningAlerts.map((alert, idx) => (
+                    <div key={`warn-${idx}`} className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-start space-x-3">
+                      <AlertTriangle className="text-yellow-400 shrink-0 mt-0.5" size={16} />
+                      <div>
+                        <p className="text-sm font-medium text-yellow-400">{alert.category}: {alert.percentage}% Used</p>
+                        <p className="text-xs text-[var(--text-muted)]">Only ₹{alert.remaining.toLocaleString('en-IN')} remaining of ₹{alert.limit.toLocaleString('en-IN')}</p>
+                      </div>
+                    </div>
+                  ))
+                }
+                {analysis.overspendingAlerts.length === 0 && (!analysis.warningAlerts || analysis.warningAlerts.length === 0) && (
                   <div className="p-4 rounded-xl bg-fin-primary/10 border border-fin-primary/20 flex items-start space-x-3">
                     <Target className="text-fin-primary shrink-0 mt-0.5" size={18} />
                     <div>
                       <p className="text-sm font-medium text-fin-primary">All Budgets on Track</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-1">Great job! AI recommends moving ₹5,000 extra to your SIP.</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">All your spending categories are within safe limits.</p>
                     </div>
                   </div>
                 )}
-                
-                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                  <p className="text-sm font-medium text-blue-400">Subscription Alert</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-1">You have 3 active subscriptions (₹3,450/mo). Consider canceling unused ones.</p>
                 </div>
-              </div>
             </GlassCard>
           </div>
         </div>

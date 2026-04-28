@@ -1,3 +1,4 @@
+// ── Personal demo data ──
 export const sampleExpenses = [
   { id: '1', date: '2026-04-20', merchant: 'Whole Foods Market', amount: 12000, category: 'Food', paymentMode: 'Credit Card', gst: 600 },
   { id: '2', date: '2026-04-21', merchant: 'Uber', amount: 2000, category: 'Transport', paymentMode: 'UPI', gst: 100 },
@@ -9,11 +10,30 @@ export const sampleExpenses = [
 ];
 
 export const sampleBudgets = [
-  { category: 'Food', limit: 40000, spent: 25600 },
-  { category: 'Transport', limit: 16000, spent: 6800 },
-  { category: 'Shopping', limit: 24000, spent: 12000 },
-  { category: 'Entertainment', limit: 8000, spent: 3600 },
-  { category: 'Utilities', limit: 20000, spent: 16800 },
+  { category: 'Food', limit: 8000, spent: 6200 },
+  { category: 'Transport', limit: 4000, spent: 2800 },
+  { category: 'Shopping', limit: 6000, spent: 5100 },
+  { category: 'Entertainment', limit: 3000, spent: 1800 },
+  { category: 'Utilities', limit: 5000, spent: 4200 },
+];
+
+// ── Commercial demo data ──
+export const commercialExpenses = [
+  { id: 'C1', date: '2026-04-10', merchant: 'TechCorp Supplies', amount: 125000, category: 'Hardware', paymentMode: 'Bank Transfer', gst: 22500 },
+  { id: 'C2', date: '2026-04-12', merchant: 'AWS Cloud Services', amount: 45000, category: 'Cloud & IT', paymentMode: 'Credit Card', gst: 8100 },
+  { id: 'C3', date: '2026-04-15', merchant: 'Office Space Ltd', amount: 80000, category: 'Rent', paymentMode: 'Bank Transfer', gst: 14400 },
+  { id: 'C4', date: '2026-04-18', merchant: 'Marketing Solutions', amount: 35000, category: 'Marketing', paymentMode: 'Credit Card', gst: 6300 },
+  { id: 'C5', date: '2026-04-20', merchant: 'Employee Benefits Co', amount: 60000, category: 'Payroll', paymentMode: 'Bank Transfer', gst: 0 },
+  { id: 'C6', date: '2026-04-22', merchant: 'Legal Advisors LLP', amount: 28000, category: 'Services', paymentMode: 'Bank Transfer', gst: 5040 },
+];
+
+export const commercialBudgets = [
+  { category: 'Hardware', limit: 60000, spent: 45000 },
+  { category: 'Cloud & IT', limit: 40000, spent: 35000 },
+  { category: 'Rent', limit: 50000, spent: 50000 },
+  { category: 'Marketing', limit: 35000, spent: 22000 },
+  { category: 'Payroll', limit: 40000, spent: 38000 },
+  { category: 'Services', limit: 25000, spent: 18000 },
 ];
 
 export const sampleInvoices = [
@@ -29,8 +49,29 @@ export const sampleVendors = [
 ];
 
 export const initialSettings = {
-  theme: 'dark', // 'dark' | 'light'
-  userMode: 'personal', // 'personal' | 'commercial'
+  theme: 'dark',
   currency: 'INR',
-  isAuthenticated: false
+  notifications: true,
+  isAuthenticated: false,
+  userMode: null,
+  profile: {
+    name: 'Alex Mitchell',
+    email: 'alex.mitchell@example.com',
+    phone: '+1 (555) 123-4567',
+    company: 'Budgify'
+  },
+  financialProfile: {
+    personal: {
+      fixedIncome: 50000,
+      variableIncome: 10000,
+      savingsGoal: 15000,
+      precommittedExpenses: 15000
+    },
+    commercial: {
+      monthlyRevenueTarget: 500000,
+      operatingBudget: 350000,
+      taxReservePercent: 18,
+      precommittedExpenses: 100000
+    }
+  }
 };

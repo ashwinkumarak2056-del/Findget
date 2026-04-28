@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { sampleExpenses, sampleBudgets, initialSettings, sampleInvoices, sampleVendors } from '../data/sampleData';
+import { sampleExpenses, sampleBudgets, commercialExpenses, commercialBudgets, initialSettings, sampleInvoices, sampleVendors } from '../data/sampleData';
 
 const AppContext = createContext();
 
@@ -12,16 +12,21 @@ const loadState = () => {
         budgets: sampleBudgets,
         invoices: sampleInvoices,
         vendors: sampleVendors,
+        notifications: [],
         settings: initialSettings
       };
     }
-    return JSON.parse(serializedState);
+    const parsed = JSON.parse(serializedState);
+    // Ensure notifications array exists for older states
+    if (!parsed.notifications) parsed.notifications = [];
+    return parsed;
   } catch (err) {
     return {
       expenses: sampleExpenses,
       budgets: sampleBudgets,
       invoices: sampleInvoices,
       vendors: sampleVendors,
+      notifications: [],
       settings: initialSettings
     };
   }
@@ -40,11 +45,21 @@ const appReducer = (state, action) => {
       };
     case 'DELETE_EXPENSE':
       return { ...state, expenses: state.expenses.filter(e => e.id !== action.payload) };
+    case 'ADD_BUDGET':
+      if (state.budgets.some(b => b.category.toLowerCase() === action.payload.category.toLowerCase())) {
+        return state;
+      }
+      return {
+        ...state,
+        budgets: [...state.budgets, action.payload]
+      };
     case 'UPDATE_BUDGET':
       return {
         ...state,
         budgets: state.budgets.map(b => b.category === action.payload.category ? action.payload : b)
       };
+    case 'SET_BUDGETS':
+      return { ...state, budgets: action.payload };
     case 'TOGGLE_THEME':
       return {
         ...state,
@@ -55,15 +70,63 @@ const appReducer = (state, action) => {
         ...state,
         settings: { ...state.settings, userMode: action.payload }
       };
-    case 'LOGIN':
+    case 'LOGIN': {
+      // Swap to mode-appropriate demo data
+      const mode = action.payload;
+      const newExpenses = mode === 'commercial' ? commercialExpenses : sampleExpenses;
+      const newBudgets = mode === 'commercial' ? commercialBudgets : sampleBudgets;
       return {
         ...state,
-        settings: { ...state.settings, isAuthenticated: true, userMode: action.payload }
+        expenses: newExpenses,
+        budgets: newBudgets,
+        notifications: [], // Clear old notifications on login
+        settings: { ...state.settings, isAuthenticated: true, userMode: mode }
       };
+    }
     case 'LOGOUT':
       return {
         ...state,
         settings: { ...state.settings, isAuthenticated: false }
+      };
+    case 'SET_FINANCIAL_PROFILE':
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          financialProfile: {
+            ...state.settings.financialProfile,
+            [action.payload.mode]: {
+              ...state.settings.financialProfile?.[action.payload.mode],
+              ...action.payload.data
+            }
+          }
+        }
+      };
+    case 'UPDATE_PROFILE':
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          profile: { ...state.settings.profile, ...action.payload }
+        }
+      };
+    case 'ADD_NOTIFICATION':
+      // Prevent duplicate notifications with same message
+      if (state.notifications.some(n => n.message === action.payload.message)) {
+        return state;
+      }
+      return {
+        ...state,
+        notifications: [action.payload, ...state.notifications].slice(0, 20) // Keep max 20
+      };
+    case 'CLEAR_NOTIFICATIONS':
+      return { ...state, notifications: [] };
+    case 'MARK_NOTIFICATION_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map(n =>
+          n.id === action.payload ? { ...n, read: true } : n
+        )
       };
     default:
       return state;

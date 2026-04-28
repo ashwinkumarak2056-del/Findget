@@ -24,7 +24,6 @@ const Sidebar = () => {
     { name: 'Smart Scanner', path: '/scanner', icon: <Receipt size={20} /> },
     { name: 'Expenses', path: '/expenses', icon: <CreditCard size={20} /> },
     { name: 'Budget Planner', path: '/budget', icon: <PieChart size={20} /> },
-    { name: 'Currency Converter', path: '/converter', icon: <ArrowRightLeft size={20} /> },
     { name: 'AI Insights', path: '/insights', icon: <BrainCircuit size={20} /> },
     { name: 'Investments', path: '/investments', icon: <TrendingUp size={20} /> },
   ];
@@ -49,7 +48,7 @@ const Sidebar = () => {
           <BrainCircuit className="text-white" size={24} />
         </div>
         <div>
-          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-fin-primary to-emerald-400">FinAI</h1>
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-fin-primary to-emerald-400">Budgify</h1>
           <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
             {isCommercial ? 'Enterprise' : 'Personal'} Edition
           </p>

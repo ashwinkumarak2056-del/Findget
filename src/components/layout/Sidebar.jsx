@@ -37,10 +37,10 @@ const Sidebar = () => {
     <aside className="w-64 hidden md:flex flex-col glass-panel m-4 overflow-hidden border-fin-primary/20">
       <div className="p-6 flex items-center gap-3 border-b border-white/5">
         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-fin-primary to-emerald-400 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.4)]">
-          <span className="font-bold text-white text-lg">A</span>
+          <span className="font-bold text-white text-lg">B</span>
         </div>
         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-fin-primary to-emerald-300">
-          AuraFin
+          Budgify
         </h1>
       </div>
 
